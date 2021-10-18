@@ -59,7 +59,6 @@ module.exports =  class BinarySearchTree {
       return this.findData(d, node.left);
     }
 
-    return null;
   }
 
 
@@ -93,7 +92,7 @@ module.exports =  class BinarySearchTree {
 
   remove(d) {
     const check = this.findData(d, this._rootTree);
-    if(check) {
+    if(check != null) {
 
       if(check.left == null && check.right == null) {
         if(check.prev[1]) {
@@ -103,21 +102,108 @@ module.exports =  class BinarySearchTree {
           check.prev[0].left = null;
         }
       }
-      else if(check.left == null && check.right == null) {
+      else if(check.left == null && check.right != null) {
+        if(check.prev[1]) {
+          check.prev[0].right = check.right;
+        }
+        else {
+          check.prev[0].left = check.right;
+        }
+      }
+      else if(check.right == null && check.left != null) {
+        if(check.prev[1]) {
+          check.prev[0].right = check.left;
+        }
+        else {
+          check.prev[0].left = check.left;
+        }
+      }
+      else {
+        const nodeLeft = check.left;
+        const nodeRight = check.right;
+        function nodeRightLeft(nodeRight) {
+         
+          if(nodeRight.left == null) {
+            return nodeRight;
+          }
 
+          const left = nodeRight.left;
+
+          function onlyLeft(left) {
+            if(left.left == null) {
+              return left;
+            }
+            return onlyLeft(left.left);
+          };
+
+          const nodeRightLeft =  onlyLeft(left);
+            
+
+          return nodeRightLeft;
+        }
+        const placedNode = nodeRightLeft(nodeRight);
+
+      if(check === this._rootTree) {
+        this._rootTree = placedNode;
+        placedNode.left = nodeLeft;
+        nodeRight.left = (placedNode.right != null) ? placedNode.right : null;
+        placedNode.right = nodeRight;
+      } 
+      else if(check.prev[1]){
+        check.prev[0].right = placedNode;
+        placedNode.left = nodeLeft;
+        if (nodeRight != placedNode) {
+          nodeRight.left = (placedNode.right != null) ? placedNode.right : null;
+        }
+        placedNode.right = nodeRight;
+      }
+      else{
+        check.prev[0].left = placedNode;
+        placedNode.left = nodeLeft;
+        if (nodeRight != placedNode) {
+          nodeRight.left = (placedNode.right != null) ? placedNode.right : null;
+        }
+        placedNode.right = nodeRight;
       }
 
-
-
+      }
     }
+
   }
 
   min() {
+    if(this._rootTree == null || this._rootTree.left == null) {
+      return this._rootTree;
+    }
+
+    else {
+      const tree = this._rootTree;
+      function minLeft(tree) {
+        if(tree.left == null) {
+          return tree;
+        }
+        return minLeft(tree.left);
+      }
+      return minLeft(tree).data;
+    }
    
   }
 
   max() {
-   
+    if(this._rootTree == null || this._rootTree.right == null) {
+      return this._rootTree;
+    }
+    else {
+      const tree = this._rootTree.right;
+      function maxRight(tree) {
+        if(tree.right == null) {
+          return tree;
+        }
+        return maxRight(tree.right);
+      }
+      return maxRight(tree).data;
+    }
+
   }
 
 }
